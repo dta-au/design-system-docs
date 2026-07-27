@@ -1,0 +1,11 @@
+---
+import { getEntry, render } from 'astro:content';
+import Content from '../../layouts/Content.astro';
+
+const entry = await getEntry('templates', 'index');
+const { Content: EntryContent } = await render(entry!);
+---
+
+<Content title={entry!.data.title} description={entry!.data.description}>
+  <EntryContent />
+</Content>

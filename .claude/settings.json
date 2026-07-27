@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "sandbox": {
+    "network": {
+      "allowedDomains": [
+        "drupal.org",
+        "www.drupal.org"
+      ]
+    }
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/wcag-check.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

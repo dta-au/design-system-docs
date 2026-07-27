@@ -1,0 +1,38 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title?: string;
+  lead?: string;
+  // Markdown pages render the layout with frontmatter wrapped under this prop.
+  frontmatter?: { title?: string; lead?: string };
+}
+
+const { title, lead, frontmatter } = Astro.props;
+const resolvedTitle = title ?? frontmatter?.title ?? '';
+const resolvedLead = lead ?? frontmatter?.lead;
+---
+
+<BaseLayout title={resolvedTitle}>
+  <main
+    id="main-content"
+    class="ct-layout ct-layout--no-top-right ct-layout--no-bottom-right ct-layout--no-top-left ct-layout--no-bottom-left ct-vertical-spacing--top"
+    role="main"
+  >
+    <div class="ct-layout__inner container" data-masonry="true">
+      <section class="ct-layout__main">
+        <h1>{resolvedTitle}</h1>
+        {resolvedLead && <p class="ct-text-large">{resolvedLead}</p>}
+        <div class="ct-theme-light ct-basic-content ct-vertical-spacing--both">
+          <div class="container">
+            <div class="row">
+              <div class="col-xxs-12">
+                <slot />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</BaseLayout>

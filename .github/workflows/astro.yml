@@ -1,0 +1,102 @@
+name: Deploy Astro site to Pages
+
+on:
+  # Build and deploy on every push to main.
+  push:
+    branches: [main]
+  # Manual runs from the Actions tab.
+  workflow_dispatch:
+  # uikit-released: fired by the UIKit release workflow when a new
+  # design-system twig package version is published; client_payload names the package,
+  # version to pin. docs-updated: fired on push to docs-live so content
+  # advances rebuild the site without waiting for a release.
+  repository_dispatch:
+    types: [uikit-released, docs-updated]
+
+permissions:
+  # contents: write lets the dispatch build commit the bumped pin back to main.
+  contents: write
+  pages: write
+  id-token: write
+
+# One Pages deploy at a time. Don't cancel in-progress deploys.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          # Astro 6 requires Node >= 22.12.
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bump and pin UIKit version (on UIKit release)
+        # event.action carries the dispatch type; docs-updated must skip the
+        # pin step (its payload has no version) and go straight to the build.
+        if: github.event.action == 'uikit-released'
+        env:
+          NEW_VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          set -euo pipefail
+          PKG="${{ github.event.client_payload.package }}"
+          PKG="${PKG:-@dta-au/designsystem-twig}"
+          npm install --save-exact "${PKG}@${NEW_VERSION}"
+          npm run sync:uikit
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json public/civictheme.css public/civictheme.variables.css public/civictheme.base.js
+          if git diff --staged --quiet; then
+            echo "Already pinned to ${NEW_VERSION}; nothing to commit."
+          else
+            # [skip ci] + GITHUB_TOKEN pushes (which don't re-trigger workflows)
+            # both prevent a push -> build -> commit loop.
+            git commit -m "Pin ${PKG} to ${NEW_VERSION} [skip ci]"
+            git push
+          fi
+
+      - name: Build with Astro
+        # prebuild runs scripts/sync-uikit.mjs, so public/ always reflects the pin.
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  # Runs after build (not gating deploy) so the SBOMs land as artifacts of
+  # every deploy run. needs: build + ref: main means a dispatch-triggered pin
+  # bump is already on main before the SBOM checkout, so the SBOM reflects the
+  # deployed lockfile. A scan failure marks the run failed without blocking
+  # the deploy.
+  sbom:
+    name: SBOM
+    needs: build
+    permissions:
+      contents: read
+    uses: ./.github/workflows/sbom.yml
+    with:
+      ref: main
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
