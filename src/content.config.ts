@@ -14,7 +14,7 @@ const baseFields = {
   // Defaults: true on foundations, false elsewhere – any upstream doc can
   // override per page. See /patterns/in-page-navigation/.
   toc: z.boolean().optional(),
-  // Deepest heading level the ToC lists (default 4).
+  // Deepest heading level the ToC lists (default 2 – opt up per page).
   'toc-max-level': z.number().int().min(2).max(4).optional(),
 };
 

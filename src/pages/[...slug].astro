@@ -51,7 +51,9 @@ const hasDemo =
 // with the full-width layout.
 const toc = entry.data.toc ?? entry.collection === 'foundations';
 const fullWidth = entry.collection === 'foundations' || toc;
-const tocMaxLevel = entry.data['toc-max-level'] ?? 4;
+// H2-only by default – deeper trees drown the ToC. Docs opt up per page with
+// `toc-max-level: 3` or `4`.
+const tocMaxLevel = entry.data['toc-max-level'] ?? 2;
 ---
 
 <Content

@@ -10,7 +10,7 @@ interface Props {
   // Generate the "On this page" table of contents directly below the page
   // introduction, before the first H2 – see /patterns/in-page-navigation/.
   toc?: boolean;
-  // Deepest heading level the ToC lists (2–4).
+  // Deepest heading level the ToC lists (2–4); H2-only unless a page opts up.
   tocMaxLevel?: number;
 }
 
@@ -20,7 +20,7 @@ const {
   lead,
   fullWidth = false,
   toc = false,
-  tocMaxLevel = 4,
+  tocMaxLevel = 2,
 } = Astro.props;
 ---
 
