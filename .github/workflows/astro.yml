@@ -35,8 +35,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v7
         with:
-          # Astro 6 requires Node >= 22.12.
-          node-version: '22'
+          # Astro 6 requires Node >= 22.12; we track 24 to match dta-au/design-system.
+          node-version: '24'
           cache: 'npm'
 
       - name: Install dependencies
