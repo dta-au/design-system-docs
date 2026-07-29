@@ -74,21 +74,6 @@ const {
       )}
     </div>
   </main>
-  <style is:global>
-    /* Table of contents: nested entries indent their text, keeping every
-       link's box and stripe flush left; H4 entries hold the H3 indent one
-       size smaller (documented at /components/table-of-contents/). Drop
-       once the synced civictheme.css ships these rules. */
-    .ct-table-of-contents .ct-table-of-contents__links--child {
-      padding-left: 0;
-    }
-    .ct-table-of-contents__links--child .ct-table-of-contents__link {
-      padding-left: 2rem;
-    }
-    .ct-table-of-contents__links--child .ct-table-of-contents__links--child .ct-table-of-contents__link {
-      font-size: 0.8125rem;
-    }
-  </style>
   <script>
     import '../scripts/colour-swatches';
   </script>
