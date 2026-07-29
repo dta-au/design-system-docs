@@ -20,9 +20,9 @@ import { tmpdir } from 'node:os'
 import { basename, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-// Update when the repo transfers to dta-au/design-system.
-const REPO = 'https://github.com/dta-au/design-system.git'
-const REF = 'docs-live'
+// SYNC_CONTENT_REPO / SYNC_CONTENT_REF let a batch branch preview locally; defaults are production.
+const REPO = process.env.SYNC_CONTENT_REPO ?? 'https://github.com/dta-au/design-system.git'
+const REF = process.env.SYNC_CONTENT_REF ?? 'docs-live'
 const GUIDANCE = ['patterns', 'templates', 'foundations']
 const COMPONENT_DIRS = ['components', 'components-advanced']
 
