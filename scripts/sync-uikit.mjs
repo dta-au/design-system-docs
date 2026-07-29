@@ -39,6 +39,21 @@ if (!existsSync(distDir)) {
   process.exit(0)
 }
 
+// public/civictheme.* are tracked, so a stale node_modules silently overwrites
+// them with older assets – git updates the pin and the committed files, but
+// never node_modules. Only checked for an exact pin; a range is npm's to resolve.
+const readJson = (p) => JSON.parse(readFileSync(p, 'utf8'))
+const pinned = readJson(resolve(root, 'package.json')).dependencies?.['@dta-au/designsystem-twig']
+const installed = readJson(resolve(distDir, '../package.json')).version
+
+if (pinned && /^\d+\.\d+\.\d+/.test(pinned) && pinned !== installed) {
+  console.error(
+    `[sync-uikit] node_modules has @dta-au/designsystem-twig ${installed} but package.json pins ${pinned}.\n` +
+      `[sync-uikit] Syncing now would overwrite public/ with the stale version. Run: npm ci`,
+  )
+  process.exit(1)
+}
+
 mkdirSync(publicDir, { recursive: true })
 for (const [from, to, transform] of FILES) {
   const src = resolve(distDir, from)
