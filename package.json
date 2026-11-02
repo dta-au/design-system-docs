@@ -28,7 +28,7 @@
     "@dta-au/designsystem-twig": "1.1.0",
     "astro": "^6.0.0",
     "remark-deflist": "^1.0.0",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.2.0"
   },
   "devDependencies": {
     "pa11y-ci": "^4.1.1",
